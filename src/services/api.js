@@ -1,13 +1,13 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: import.meta.env.VITE_API_URL + '/api', // ✅ Dynamic base URL
   headers: {
     'Content-Type': 'application/json'
   }
 })
 
-// Request interceptor to add auth token
+// ✅ Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token')
@@ -16,19 +16,14 @@ api.interceptors.request.use(
     }
     return config
   },
-  (error) => {
-    return Promise.reject(error)
-  }
+  (error) => Promise.reject(error)
 )
 
-// Response interceptor to handle errors
+// ✅ Response interceptor to handle errors globally
 api.interceptors.response.use(
-  (response) => {
-    return response
-  },
+  (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Token expired or invalid
       localStorage.removeItem('token')
       window.location.href = '/login'
     }
@@ -36,4 +31,4 @@ api.interceptors.response.use(
   }
 )
 
-export default api 
+export default api
